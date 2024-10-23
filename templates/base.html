@@ -27,7 +27,7 @@
                     <div class="navbar-nav">
 
                         {% for m in menu %}
-                        <a class="nav-link" href="{{ m.url }}">{{ m.name }}</a>
+                        <a class="nav-link" href="{{ url_for(m.url)  }}">{{ m.title }}</a>
                         {% endfor %}
                     </div>
                 </div>

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+
+{% for cat, msg in get_flashed_messages(with_categories=True) %}
+<div class="text-{{ cat }}">{{ msg }}</div>
+{% endfor %}
+
+<form action="{{ url_for('addPost') }}" method="post">
+    <div class="mb-3">
+      <label class="form-label">Название статьи:</label>
+      <input type="text" name="name" value="" class="form-control" required>
+      
+    </div>
+    <div class="mb-3">
+      <label class="form-label">URL:</label>
+      <input type="text" name="url" value="" class="form-control" required>
+      
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Текст статьи:</label>
+      <textarea  class="form-control" name="post" cols="30" rows="10"></textarea>
+    </div>
+    
+    <button type="submit" class="btn btn-primary" value="">Добавить</button>
+  </form>
+{% endblock %}
