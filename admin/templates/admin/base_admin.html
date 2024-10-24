@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('.static', filename='css/bootstrap.min.css')}}">
+    <title>{{title}}</title>
+</head>
+
+<body>
+    {% if menu %}
+<ul>
+    {% for p in menu %}
+    <li>
+        <a href="{{ url_for(p.url) }}">{{ p.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
+    {% endif %}
+    {% block content %}
+    {% endblock %}
+</body>
+
+</html>
