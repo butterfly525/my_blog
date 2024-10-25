@@ -9,17 +9,36 @@
 </head>
 
 <body>
-    {% if menu %}
-<ul>
-    {% for p in menu %}
-    <li>
-        <a href="{{ url_for(p.url) }}">{{ p.title }}</a>
-    </li>
-    {% endfor %}
-</ul>
-    {% endif %}
-    {% block content %}
-    {% endblock %}
+    <div class="container-fluid m-0 p-0">
+        <nav class="navbar navbar-expand-lg px-5" style="background-color: #e3f2fd;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Flask</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+                    aria-label="Переключатель навигации">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+
+                        {% for m in menu %}
+                        <a class="nav-link" href="{{ url_for(m.url) }}">{{ m.title }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container">
+        {% block content %}
+        {% block mainmenu %}
+
+
+        {% endblock %}
+
+        {% endblock %}
+    </div>
 </body>
 
 </html>
