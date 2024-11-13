@@ -1,24 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('.static', filename='css/bootstrap.min.css')}}">
     <title>{{title}}</title>
 </head>
 
 <body>
-<<<<<<< HEAD
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="{{ category }}">{{ message }}</div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-    {% block content %}
-    {% endblock %}
-=======
     <div class="container-fluid m-0 p-0">
         <nav class="navbar navbar-expand-lg px-5" style="background-color: #e3f2fd;">
             <div class="container-fluid">
@@ -46,14 +36,9 @@
 
 
         {% endblock %}
-        {% if title %}
-        <h1>{{ title }}</h1>
-        {% else %}
-        <h1>Про Flask</h1>
-        {% endif %}
+
         {% endblock %}
     </div>
->>>>>>> refs/remotes/origin/master
 </body>
 
 </html>

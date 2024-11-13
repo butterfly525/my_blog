@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(with_categories=True) %}
+<div class="text-{{ cat }}">{{ msg }}</div>
+{% endfor %}
+<table>
+    <tr>
+        <td valign="top">
+            <div><img src="{{ url_for('userava') }}" alt=""></div>
+            <div>
+                <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+                    <p><input type="file" name="file"></p>
+                    <p><input type="submit" value="Загрузить"></p>
+                </form>
+            </div>
+        </td>
+        <td valign="top">
+            <p><a href="{{ url_for('logout') }}">Выйти из профиля</a></p>
+            <ul>
+                <li>Имя: {{ current_user.getName() }}</li>
+                <li>Email: {{ current_user.getEmail() }}</li>
+            </ul>
+        </td>
+    </tr>
+</table>
+{% endblock %}
