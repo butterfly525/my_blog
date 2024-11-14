@@ -4,7 +4,9 @@ services:
     image: postgres:latest
     container_name: postgres-db
     environment:
+      POSTGRES_USER: admin_my_blog
       POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: my_blog
     volumes:
       - ./data:/var/lib/postgresql/data
     ports:
