@@ -61,6 +61,22 @@ def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
+        # Проверка существования имени пользователя
+        existing_user_username = User.query.filter_by(
+            username=form.username.data).first()
+        if existing_user_username:
+            flash('Такое имя пользователя уже занято. Выберите другое имя.', 'danger')
+            return render_template('register.html', form=form)
+
+        # Проверка существования email
+        existing_user_email = User.query.filter_by(
+            email=form.email.data).first()
+        if existing_user_email:
+            flash(
+                'Такой email уже зарегистрирован. Войдите или используйте другой email.', 'danger')
+            return render_template('register.html', form=form)
+
+        # Если проверки пройдены успешно, создаем нового пользователя
         user = User(username=form.username.data,
                     email=form.email.data)
         user.set_password(form.password.data)
@@ -68,10 +84,9 @@ def register():
         db.session.commit()
         login_user(user)
 
+        flash('Вы успешно зарегистрированы!', 'success')
         return redirect(url_for('index'))
 
-    else:
-        flash('Невалидные данные.', 'danger')
     return render_template('register.html', form=form)
 
 
@@ -83,44 +98,52 @@ def add_post():
 
     form = PostForm()  # Предполагается, что у вас есть форма для добавления поста
     if form.validate_on_submit():
-        post = Post(
-            title=form.title.data,
-            content=form.content.data,
-            author=current_user,
-            created_at=datetime.now(),
-            edited_at=datetime.now()
-        )
-        db.session.add(post)
+        try:
+            post = Post(
+                title=form.title.data,
+                content=form.content.data,
+                author=current_user,
+                created_at=datetime.now(),
+                edited_at=datetime.now()
+            )
+            db.session.add(post)
+            db.session.flush()  # Это обновит id в сессии
 
-        # Сохраняем фотографии
-        for photo in request.files.getlist('photos'):
-            filename = secure_filename(photo.filename)
-            print(filename)
-            photo_path = os.path.join(UPLOAD_FOLDER, filename)
-            print(photo_path)
-            photo.save(photo_path)  # Сохраняем файл на диск
+            post_id = post.id
+            # Сохраняем фотографии
+            for photo in request.files.getlist('photos'):
+                filename = photo.filename
+                if filename:
+                    filename = f"{post_id}_{filename}"
+                    photo_path = os.path.join(UPLOAD_FOLDER, filename)
+                    photo.save(photo_path)  # Сохраняем файл на диск
+                    # Создаем экземпляр модели Photo
+                    # Используем поле image
+                    photo_model = Photo(image=filename, post=post)
+                    db.session.add(photo_model)
 
-            # Создаем экземпляр модели Photo
-            # Используем поле image
-            photo_model = Photo(image=photo_path, post=post)
-            db.session.add(photo_model)
-
-        db.session.commit()
-
-        return redirect(url_for('index'))
-
+            db.session.commit()
+            return redirect(url_for('index'))
+        except Exception as e:
+            print(f"{e}", 'danger')
+    
     return render_template('add_post.html', form=form)
 
 
-@app.route('/delete_photo/<int:post_id>/<int:photo_id>', methods=['POST'])
+@app.route('/post/<id>', methods=['GET'])
 @login_required
-def delete_photo(post_id, photo_id):
-    post = Post.query.get_or_404(post_id)
-    photo = Photo.query.filter_by(id=photo_id).first_or_404()
-    db.session.delete(photo)
-    db.session.commit()
-    flash('Фото успешно удалено!', 'success')
-    return redirect(url_for('view_post', post_id=post.id))
+def read_post(id):
+    post = Post.query.get_or_404(id)
+    # Формирование словаря с информацией о посте
+    formatted_post = {
+        'id': post.id,
+        'title': post.title,
+        'content': post.content,
+        'edited_at': post.edited_at.strftime('%d-%m-%Y %H:%M'),
+        'photos': [photo.image for photo in post.photos]
+    }
+
+    return render_template('read_post.html', post=formatted_post)
 
 
 @app.route('/')
@@ -128,16 +151,16 @@ def index():
     posts = Post.query.order_by(Post.edited_at.desc())
     formatted_posts = [
         {
+            'id': post.id,
             'title': post.title,
             'content': post.content,
             'author': post.author.username,
             'edited_at': post.edited_at.strftime('%d-%m-%Y %H:%M'),
             'photos': [photo.image for photo in post.photos]
-            
+
         }
         for post in posts
     ]
-    print(formatted_posts)
     return render_template('index.html', posts=formatted_posts)
 
 

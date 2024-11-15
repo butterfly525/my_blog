@@ -1,26 +1,74 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-    <h1>Посты</h1>
-    {% for post in posts %}
-    <div class="mb-5">
-        <div class="d-flex align-items-center"><h5 class="my-auto">{{ post.title }}</h5> <span class="my-auto ms-auto">{{ post.edited_at }}</span></div>
-        <br>
-        <p>{{ post.content }}</p>
-      
-        
-        {% if post.photos %}
-            <h6>Фотографии:</h6>
-            <div class="row">
-                {% for photo in post.photos %}
-                    <div class="col-md-3 mb-3">
-                        <img src="{{ photo }}" alt="{{ photo }}" max-width="200" max-height="200">
+<div>
+    <div class="container-fluid mt-5">
+        {% if posts %}
+        {% set featured_post = posts[0] %}
+        {% set other_posts = posts[1:] %}
+
+        <!-- Первый пост в одной колонке -->
+        <div class="row mb-5">
+            <div class="col-md-12">
+                <div class="card border-0 shadow-sm" data-post-id="{{ featured_post.id }}">
+                    <div class="card-body">
+                        <h2 class="mb-3">{{ featured_post.title }}</h2>
+                        <small class="text-muted">{{ featured_post.edited_at }}</small>
+                        <p class="mt-3">{{ featured_post.content | truncate(200) }}</p>
+
+                        {% if featured_post.photos %}
+                        <div class="row">
+                            {% for photo in featured_post.photos %}
+                            <div class="col-md-4 mb-3">
+                                <img class="image-post w-100" src="{{ url_for('static', filename='uploads/' + photo) }}" alt="{{ photo }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                {% endfor %}
+                </div>
             </div>
-        {% endif %}<hr>
+        </div>
+
+        <!-- Остальные посты в двух колонках -->
+        {% for post in other_posts|batch(2) %}
+        <div class="row mb-5">
+            {% for item in post %}
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm" data-post-id="{{ item.id }}">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <h5 class="my-auto">{{ item.title }}</h5>
+                            <span class="my-auto ms-auto text-muted">{{ item.edited_at }}</span>
+                        </div>
+                        <br>
+                        <p>{{ item.content | truncate(150) }}</p>
+
+                        {% if item.photos %}
+                        <div class="row">
+                            {% for photo in item.photos %}
+                            <div class="col-md-4 mb-3">
+                                <img class="image-post w-100" src="{{ url_for('static', filename='uploads/' + photo) }}" alt="{{ photo }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        {% endif %}
     </div>
-    
-    {% endfor %}
+
 </div>
+<script>
+    $(document).ready(function () {
+        $('.card').on('click', function () {
+            var post_id = $(this).data('post-id'); // Предполагается, что у каждой карточки есть атрибут data-post-id
+            window.location.href = '/post/' + post_id; // Переход к странице конкретного поста
+        });
+    });
+</script>
 {% endblock %}

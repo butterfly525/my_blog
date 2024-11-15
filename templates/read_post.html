@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="post-container">
+    <h1>{{ post.title }}</h1>
+
+    <small class="text-muted">{{ post.edited_at }}</small>
+
+    <hr>
+    <p>{{ post.content }}</p>
+
+    {% if post.photos %}
+<div class="row">
+    {% for photo in post.photos %}
+    <div class="col-md-6">
+        <img class="image-post" src="{{ url_for('static', filename='uploads/' + photo) }}" alt="Photo for post">
+    </div> {% endfor %}
+</div>
+    {% endif %}
+</div>
+{% endblock %}
